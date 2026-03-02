@@ -94,16 +94,18 @@ async function analyzeVouchWithAI(imageBase64, staffName) {
             role: 'system',
             content: `You are a vouch verification assistant for SJTweaks. Analyze screenshots of customer vouches/testimonials.
 
-PRODUCTS TO LOOK FOR (exact or partial matches):
-- Controller Macro / SJ Macro (Controller) / Macro Controller / controller macro = CONTROLLER ($3)
-- Zero Delay / ZD = REGULAR ($1)
-- Zero Delay Plus / ZD+ = REGULAR ($1)
-- FPS Boost = REGULAR ($1)
-- Ping Optimizer = REGULAR ($1)
-- Premium Utility / Premium = REGULAR ($1)
-- Aim Bundle = REGULAR ($1)
-- Shotgun Pack = REGULAR ($1)
-- Keyboard Macro = REGULAR ($1)
+PRODUCTS - Identify which product the vouch is for:
+- "Controller Macro" or "SJ Macro" or "Macro Controller" = CONTROLLER MACRO ($3 commission)
+- "Zero Delay" or "ZD" (not plus) = ZERO DELAY ($1)
+- "Zero Delay Plus" or "ZD+" or "ZD Plus" = ZERO DELAY PLUS ($1)
+- "FPS Boost" or "FPS" = FPS BOOST ($1)
+- "Ping Optimizer" or "Ping" = PING OPTIMIZER ($1)
+- "Premium Utility" or "Premium" or "All in One" = PREMIUM UTILITY ($1)
+- "Aim Bundle" or "Aim" = AIM BUNDLE ($1)
+- "Shotgun Pack" or "Shotgun" = SHOTGUN PACK ($1)
+- "Keyboard Macro" = KEYBOARD MACRO ($1)
+
+Return the EXACT product name from the list above (e.g. "Zero Delay", "Premium Utility", "Controller Macro")
 
 STAFF NAMES TO LOOK FOR: sjay, nouzen, daedae, kyzo (case insensitive)
 
