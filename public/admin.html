@@ -3,205 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SJTweaks Admin - Vouch Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Admin | SJTweaks Staff</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
-            --bg-dark: #0a0a0f;
-            --bg-card: #12121a;
-            --bg-card-hover: #1a1a25;
-            --cyan: #00d9ff;
-            --cyan-dim: #00d9ff40;
-            --text: #e8e8e8;
-            --text-dim: #888;
-            --success: #22c55e;
-            --error: #ef4444;
-            --warning: #f59e0b;
+            --bg: #0d0d0d;
+            --surface: #161616;
+            --surface-2: #1f1f1f;
+            --border: #2a2a2a;
+            --text: #fafafa;
+            --text-2: #a0a0a0;
+            --accent: #10b981;
+            --red: #f43f5e;
+            --orange: #f97316;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Syne', sans-serif;
-            background: var(--bg-dark);
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
             color: var(--text);
             min-height: 100vh;
         }
 
-        /* Grid background */
-        .bg-grid {
+        body::before {
+            content: '';
             position: fixed;
             inset: 0;
-            background-image: 
-                linear-gradient(rgba(239, 68, 68, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(239, 68, 68, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
             pointer-events: none;
         }
 
-        /* Login overlay */
+        /* Login */
         .login-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.95);
+            background: var(--bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
+            z-index: 100;
         }
 
         .login-overlay.hidden { display: none; }
 
         .login-box {
-            background: var(--bg-card);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 20px;
-            padding: 50px;
-            text-align: center;
-            max-width: 400px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px;
             width: 90%;
+            max-width: 380px;
+            text-align: center;
         }
 
         .login-box h1 {
-            color: var(--error);
-            font-size: 1.5rem;
-            margin-bottom: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
 
         .login-box p {
-            color: var(--text-dim);
-            margin-bottom: 30px;
+            color: var(--text-2);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
         }
 
         .login-box input {
             width: 100%;
-            padding: 15px 20px;
-            background: var(--bg-dark);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
+            padding: 14px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             color: var(--text);
-            font-family: 'Space Mono', monospace;
-            font-size: 1rem;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
         }
 
         .login-box input:focus {
             outline: none;
-            border-color: var(--error);
+            border-color: var(--red);
         }
 
         .login-box button {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--error) 0%, #b91c1c 100%);
+            padding: 14px;
+            background: var(--red);
             border: none;
-            border-radius: 12px;
-            color: white;
-            font-family: 'Syne', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: opacity 0.2s;
         }
 
-        .login-box button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
-        }
+        .login-box button:hover { opacity: 0.9; }
 
-        .login-error {
-            color: var(--error);
-            margin-top: 15px;
+        .login-err {
+            color: var(--red);
+            font-size: 0.85rem;
+            margin-top: 12px;
             display: none;
         }
 
-        /* Main content */
-        .container {
+        /* App */
+        .app {
             position: relative;
             z-index: 1;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 40px 24px;
         }
 
-        .header {
+        header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 40px;
+            gap: 24px;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
             flex-wrap: wrap;
-            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            width: 44px;
+            height: 44px;
+            filter: brightness(1.2) hue-rotate(320deg);
         }
 
-        .logo img {
-            width: 50px;
-            height: 50px;
-            filter: drop-shadow(0 0 20px var(--error));
+        header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
         }
 
-        .logo h1 {
-            font-family: 'Space Mono', monospace;
-            font-size: 1.5rem;
-            color: var(--error);
+        header h1 span {
+            color: var(--text-2);
+            font-weight: 400;
         }
 
-        .logo span {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-dim);
-        }
-
-        .total-payout {
-            background: var(--bg-card);
-            border: 1px solid var(--success);
-            border-radius: 12px;
-            padding: 15px 30px;
+        .total-box {
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            padding: 12px 24px;
             text-align: right;
         }
 
-        .total-payout span {
+        .total-box span {
             display: block;
-            font-size: 0.8rem;
-            color: var(--text-dim);
+            font-size: 0.75rem;
+            color: var(--text-2);
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .total-payout .amount {
-            font-family: 'Space Mono', monospace;
-            font-size: 2rem;
-            color: var(--success);
-            font-weight: 700;
+        .total-box strong {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
+            color: var(--accent);
         }
 
-        /* Staff cards */
-        .staff-grid {
+        /* Grid */
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 20px;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
         }
 
         .staff-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 25px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s;
-        }
-
-        .staff-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
         .staff-card::before {
@@ -210,388 +202,394 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px;
             background: var(--card-color);
         }
 
         .staff-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 20px;
         }
 
         .staff-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--card-color);
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
         .staff-earnings {
-            font-family: 'Space Mono', monospace;
-            font-size: 1.8rem;
-            color: var(--success);
-            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--accent);
         }
 
         .staff-stats {
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
-        .staff-stat {
+        .mini-stat {
             flex: 1;
-            background: var(--bg-dark);
-            padding: 15px;
-            border-radius: 10px;
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 8px;
             text-align: center;
         }
 
-        .staff-stat span {
+        .mini-stat span {
             display: block;
-            font-size: 0.75rem;
-            color: var(--text-dim);
+            font-size: 0.7rem;
+            color: var(--text-2);
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
-        .staff-stat strong {
-            font-family: 'Space Mono', monospace;
-            font-size: 1.3rem;
+        .mini-stat strong {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
         }
 
         .reset-btn {
             width: 100%;
             padding: 10px;
             background: transparent;
-            border: 1px solid var(--error);
-            border-radius: 8px;
-            color: var(--error);
-            font-family: 'Syne', sans-serif;
-            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-2);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .reset-btn:hover {
-            background: var(--error);
-            color: white;
+            border-color: var(--red);
+            color: var(--red);
         }
 
-        /* Recent vouches */
-        .vouches-section {
-            background: var(--bg-card);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 25px;
+        /* Charts section */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
         }
 
-        .vouches-section h2 {
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .chart-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             margin-bottom: 20px;
+        }
+
+        .chart-wrap {
             display: flex;
+            justify-content: center;
+        }
+
+        .chart-wrap canvas {
+            max-width: 220px !important;
+            max-height: 220px !important;
+        }
+
+        /* Vouches table */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .vouches-section h2::before {
-            content: '';
-            width: 4px;
-            height: 25px;
-            background: var(--error);
-            border-radius: 2px;
+        .table-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .vouches-table {
+        .reset-all {
+            padding: 8px 16px;
+            background: var(--red);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .reset-all:hover { opacity: 0.85; }
+
+        table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
         }
 
-        .vouches-table th,
-        .vouches-table td {
-            padding: 15px;
+        th, td {
+            padding: 14px 12px;
             text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--border);
         }
 
-        .vouches-table th {
-            color: var(--text-dim);
-            font-size: 0.8rem;
+        th {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-2);
             text-transform: uppercase;
-            font-weight: 600;
         }
 
-        .vouches-table tr:hover td {
-            background: var(--bg-card-hover);
-        }
+        tr:hover td { background: var(--surface-2); }
 
-        .staff-badge {
+        .badge {
             display: inline-block;
             padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .product-tag {
-            font-size: 0.75rem;
-            padding: 3px 8px;
             border-radius: 4px;
-            background: var(--cyan-dim);
-            color: var(--cyan);
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
-        .product-tag.controller {
-            background: rgba(168, 85, 247, 0.3);
-            color: #a855f7;
-        }
-
-        .delete-btn {
+        .del-btn {
             padding: 6px 12px;
             background: transparent;
-            border: 1px solid var(--error);
-            border-radius: 6px;
-            color: var(--error);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-2);
+            font-size: 0.75rem;
             cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
-        .delete-btn:hover {
-            background: var(--error);
-            color: white;
+        .del-btn:hover {
+            border-color: var(--red);
+            color: var(--red);
         }
 
-        .reset-all-btn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, var(--error) 0%, #b91c1c 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 30px;
+        .tag {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 6px;
         }
 
-        .reset-all-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
-        }
+        .tag.purple { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+        .tag.blue { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
 
-        @media (max-width: 768px) {
-            .vouches-table { font-size: 0.85rem; }
-            .vouches-table th, .vouches-table td { padding: 10px; }
-            .staff-earnings { font-size: 1.4rem; }
+        @media (max-width: 700px) {
+            .charts-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
-
-    <!-- Login Overlay -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
-            <h1>🔒 Admin Access</h1>
-            <p>Enter admin password to continue</p>
-            <input type="password" id="passwordInput" placeholder="Enter password..." autocomplete="off">
-            <button onclick="attemptLogin()">Access Dashboard</button>
-            <p class="login-error" id="loginError">❌ Invalid password</p>
+            <h1>Admin Access</h1>
+            <p>Enter password to continue</p>
+            <input type="password" id="pwInput" placeholder="Password" autocomplete="off">
+            <button onclick="login()">Enter</button>
+            <p class="login-err" id="loginErr">Invalid password</p>
         </div>
     </div>
 
-    <div class="container">
-        <header class="header">
-            <div class="logo">
-                <img src="https://i.imgur.com/MBCguvv.png" alt="SJTweaks">
-                <div>
-                    <h1>ADMIN PANEL</h1>
-                    <span>Vouch & Earnings Management</span>
-                </div>
+    <div class="app">
+        <header>
+            <div class="header-left">
+                <img src="https://i.imgur.com/MBCguvv.png" alt="" class="logo">
+                <h1>Admin <span>/ payouts</span></h1>
             </div>
-            <div class="total-payout">
-                <span>Total Payout Owed</span>
-                <div class="amount" id="totalPayout">$0.00</div>
+            <div class="total-box">
+                <span>Total Owed</span>
+                <strong id="totalOwed">$0.00</strong>
             </div>
         </header>
 
-        <button class="reset-all-btn" onclick="resetAll()">⚠️ Reset All Earnings & Vouches</button>
+        <div class="grid" id="staffGrid"></div>
 
-        <div class="staff-grid" id="staffGrid">
-            <!-- Staff cards will be inserted here -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <div class="chart-title">Earnings by Staff</div>
+                <div class="chart-wrap"><canvas id="staffChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">Product Breakdown</div>
+                <div class="chart-wrap"><canvas id="productChart"></canvas></div>
+            </div>
         </div>
 
-        <section class="vouches-section">
-            <h2>Recent Vouches</h2>
-            <table class="vouches-table">
+        <div class="table-card">
+            <div class="table-header">
+                <div class="table-title">Recent Vouches</div>
+                <button class="reset-all" onclick="resetAll()">Reset All</button>
+            </div>
+            <table>
                 <thead>
                     <tr>
                         <th>Date</th>
                         <th>Submitted By</th>
-                        <th>Staff Involved</th>
+                        <th>Staff</th>
                         <th>Product</th>
                         <th>Amount</th>
-                        <th>Action</th>
+                        <th></th>
                     </tr>
                 </thead>
-                <tbody id="vouchesBody">
-                    <!-- Vouches will be inserted here -->
-                </tbody>
+                <tbody id="vouchesBody"></tbody>
             </table>
-        </section>
+        </div>
     </div>
 
     <script>
-        const API_BASE = '';
-        let adminPassword = '';
-
-        const STAFF_COLORS = {
-            'sjay': '#00d9ff',
-            'nouzen': '#ff6b6b',
-            'daedae': '#4ecdc4',
-            'kyzo': '#a855f7'
+        const API = '';
+        let pw = '';
+        const COLORS = {
+            sjay: '#06b6d4',
+            nouzen: '#f43f5e',
+            daedae: '#10b981',
+            kyzo: '#8b5cf6'
         };
 
-        // Check for enter key on password input
-        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') attemptLogin();
-        });
+        document.getElementById('pwInput').onkeypress = e => { if (e.key === 'Enter') login(); };
 
-        async function attemptLogin() {
-            const password = document.getElementById('passwordInput').value;
-            
+        async function login() {
+            pw = document.getElementById('pwInput').value;
             try {
-                const res = await fetch(`${API_BASE}/api/vouches/admin`, {
+                const res = await fetch(`${API}/api/vouches/admin`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password })
+                    body: JSON.stringify({ password: pw })
                 });
-
                 const data = await res.json();
-
                 if (data.success) {
-                    adminPassword = password;
                     document.getElementById('loginOverlay').classList.add('hidden');
-                    loadDashboard(data);
+                    render(data);
                 } else {
-                    document.getElementById('loginError').style.display = 'block';
-                    document.getElementById('passwordInput').value = '';
+                    document.getElementById('loginErr').style.display = 'block';
                 }
-            } catch (error) {
-                document.getElementById('loginError').style.display = 'block';
+            } catch {
+                document.getElementById('loginErr').style.display = 'block';
             }
         }
 
-        function loadDashboard(data) {
-            // Calculate total payout
-            const totalPayout = data.staff.reduce((sum, s) => sum + s.totalEarnings, 0);
-            document.getElementById('totalPayout').textContent = `$${totalPayout.toFixed(2)}`;
+        function render(data) {
+            const total = data.staff.reduce((s, x) => s + x.totalEarnings, 0);
+            document.getElementById('totalOwed').textContent = `$${total.toFixed(2)}`;
 
-            // Render staff cards
-            const staffGrid = document.getElementById('staffGrid');
-            staffGrid.innerHTML = data.staff.map(staff => {
-                const color = STAFF_COLORS[staff.id] || '#888';
-                const controllerCount = data.recentVouches.filter(v => 
-                    v.staffInvolved.includes(staff.id) && v.isController
-                ).length;
-
+            // Staff cards
+            document.getElementById('staffGrid').innerHTML = data.staff.map(s => {
+                const ctrl = data.recentVouches.filter(v => v.staffInvolved.includes(s.id) && v.isController).length;
                 return `
-                    <div class="staff-card" style="--card-color: ${color}">
-                        <div class="staff-header">
-                            <div class="staff-name">${staff.name}</div>
-                            <div class="staff-earnings">$${staff.totalEarnings.toFixed(2)}</div>
-                        </div>
-                        <div class="staff-stats">
-                            <div class="staff-stat">
-                                <span>Total Vouches</span>
-                                <strong>${staff.vouchCount}</strong>
-                            </div>
-                            <div class="staff-stat">
-                                <span>Controller</span>
-                                <strong style="color: #a855f7">${controllerCount}</strong>
-                            </div>
-                        </div>
-                        <button class="reset-btn" onclick="resetStaff('${staff.id}')">Reset ${staff.name}'s Earnings</button>
+                <div class="staff-card" style="--card-color: ${COLORS[s.id]}">
+                    <div class="staff-header">
+                        <div class="staff-name" style="color: ${COLORS[s.id]}">${s.name}</div>
+                        <div class="staff-earnings">$${s.totalEarnings.toFixed(2)}</div>
                     </div>
-                `;
+                    <div class="staff-stats">
+                        <div class="mini-stat"><span>Vouches</span><strong>${s.vouchCount}</strong></div>
+                        <div class="mini-stat"><span>Controller</span><strong style="color: var(--purple)">${ctrl}</strong></div>
+                    </div>
+                    <button class="reset-btn" onclick="resetStaff('${s.id}')">Reset Earnings</button>
+                </div>`;
             }).join('');
 
-            // Render recent vouches
-            const vouchesBody = document.getElementById('vouchesBody');
-            vouchesBody.innerHTML = data.recentVouches.map(v => {
-                const submitterColor = STAFF_COLORS[v.submittedBy] || '#888';
-                const staffBadges = v.staffInvolved.map(s => {
-                    const c = STAFF_COLORS[s] || '#888';
-                    return `<span class="staff-badge" style="background: ${c}20; color: ${c}">${s}</span>`;
-                }).join(' ');
+            // Charts
+            const staffLabels = data.staff.map(s => s.name);
+            const staffData = data.staff.map(s => s.totalEarnings);
+            const staffColors = data.staff.map(s => COLORS[s.id]);
 
+            new Chart(document.getElementById('staffChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: staffLabels,
+                    datasets: [{ data: staffData, backgroundColor: staffColors, borderWidth: 0 }]
+                },
+                options: {
+                    cutout: '60%',
+                    plugins: { legend: { position: 'bottom', labels: { color: '#a0a0a0', font: { family: 'Outfit' }, padding: 12 } } }
+                }
+            });
+
+            const ctrlTotal = data.recentVouches.filter(v => v.isController).length;
+            const regTotal = data.recentVouches.length - ctrlTotal;
+
+            new Chart(document.getElementById('productChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Controller ($3)', 'Regular ($1)'],
+                    datasets: [{ data: [ctrlTotal, regTotal], backgroundColor: ['#8b5cf6', '#3b82f6'], borderWidth: 0 }]
+                },
+                options: {
+                    cutout: '60%',
+                    plugins: { legend: { position: 'bottom', labels: { color: '#a0a0a0', font: { family: 'Outfit' }, padding: 12 } } }
+                }
+            });
+
+            // Table
+            document.getElementById('vouchesBody').innerHTML = data.recentVouches.map(v => {
+                const badges = v.staffInvolved.map(s => 
+                    `<span class="badge" style="background: ${COLORS[s]}20; color: ${COLORS[s]}">${s}</span>`
+                ).join(' ');
                 return `
-                    <tr>
-                        <td>${new Date(v.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-                        <td><span class="staff-badge" style="background: ${submitterColor}20; color: ${submitterColor}">${v.submittedBy}</span></td>
-                        <td>${staffBadges}</td>
-                        <td>${v.product} <span class="product-tag ${v.isController ? 'controller' : ''}">${v.isController ? '$3' : '$1'}</span></td>
-                        <td style="font-family: 'Space Mono', monospace; color: var(--success)">$${v.earningsPerPerson.toFixed(2)}${v.staffInvolved.length > 1 ? ' each' : ''}</td>
-                        <td><button class="delete-btn" onclick="deleteVouch('${v.id}')">Delete</button></td>
-                    </tr>
-                `;
+                <tr>
+                    <td>${new Date(v.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
+                    <td><span class="badge" style="background: ${COLORS[v.submittedBy]}20; color: ${COLORS[v.submittedBy]}">${v.submittedBy}</span></td>
+                    <td>${badges}</td>
+                    <td>${v.product}<span class="tag ${v.isController ? 'purple' : 'blue'}">${v.isController ? '$3' : '$1'}</span></td>
+                    <td style="font-family: 'JetBrains Mono', monospace; color: var(--accent)">$${v.earningsPerPerson.toFixed(2)}${v.staffInvolved.length > 1 ? ' ea' : ''}</td>
+                    <td><button class="del-btn" onclick="delVouch('${v.id}')">Delete</button></td>
+                </tr>`;
             }).join('');
         }
 
-        async function resetStaff(staffId) {
-            if (!confirm(`Are you sure you want to reset ${staffId}'s earnings and vouches?`)) return;
-
-            try {
-                const res = await fetch(`${API_BASE}/api/vouches/admin/reset`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword, staffId })
-                });
-
-                if ((await res.json()).success) {
-                    location.reload();
-                }
-            } catch (error) {
-                alert('Error resetting staff');
-            }
+        async function resetStaff(id) {
+            if (!confirm(`Reset ${id}'s earnings?`)) return;
+            await fetch(`${API}/api/vouches/admin/reset`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pw, staffId: id })
+            });
+            location.reload();
         }
 
         async function resetAll() {
-            if (!confirm('⚠️ This will delete ALL vouches and reset ALL earnings. Are you sure?')) return;
-            if (!confirm('This action cannot be undone. Type CONFIRM to proceed.')) return;
-
-            try {
-                const res = await fetch(`${API_BASE}/api/vouches/admin/reset`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword })
-                });
-
-                if ((await res.json()).success) {
-                    location.reload();
-                }
-            } catch (error) {
-                alert('Error resetting all');
-            }
+            if (!confirm('Reset ALL earnings and vouches?')) return;
+            await fetch(`${API}/api/vouches/admin/reset`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pw })
+            });
+            location.reload();
         }
 
-        async function deleteVouch(vouchId) {
+        async function delVouch(id) {
             if (!confirm('Delete this vouch?')) return;
-
-            try {
-                const res = await fetch(`${API_BASE}/api/vouches/admin/delete`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: adminPassword, vouchId })
-                });
-
-                if ((await res.json()).success) {
-                    location.reload();
-                }
-            } catch (error) {
-                alert('Error deleting vouch');
-            }
+            await fetch(`${API}/api/vouches/admin/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pw, vouchId: id })
+            });
+            location.reload();
         }
     </script>
 </body>
