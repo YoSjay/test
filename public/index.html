@@ -392,17 +392,10 @@
                 </div>
             </div>
 
-            <div class="card chart-card">
-                <div class="card-title">Earnings Breakdown</div>
-                <div class="chart-container">
-                    <canvas id="earningsChart"></canvas>
-                </div>
-            </div>
-
-            <div class="card chart-card">
-                <div class="card-title">Vouch Types</div>
-                <div class="chart-container">
-                    <canvas id="typesChart"></canvas>
+            <div class="card chart-card" style="grid-column: 1 / -1;">
+                <div class="card-title">Products Sold</div>
+                <div class="chart-container" style="min-height: 280px;">
+                    <canvas id="productsChart"></canvas>
                 </div>
             </div>
 
@@ -432,7 +425,7 @@
         const API = '';
         let staff = null;
         let file = null;
-        let earningsChart, typesChart;
+        let productsChart;
 
         // Tabs
         document.querySelectorAll('.tab').forEach(t => {
@@ -459,48 +452,49 @@
             const regular = s.vouchCount - controller;
             document.getElementById('controllerCount').textContent = controller;
 
-            // Charts
-            const controllerEarn = controller * 3;
-            const regularEarn = s.totalEarnings - controllerEarn;
-
-            if (earningsChart) earningsChart.destroy();
-            if (typesChart) typesChart.destroy();
-
-            const chartOpts = {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { 
-                        position: 'bottom',
-                        labels: { color: '#a0a0a0', font: { family: 'Outfit', size: 12 }, padding: 16 }
-                    }
-                }
-            };
-
-            earningsChart = new Chart(document.getElementById('earningsChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Controller ($3)', 'Regular ($1)'],
-                    datasets: [{
-                        data: [controllerEarn || 0, regularEarn || 0],
-                        backgroundColor: ['#8b5cf6', '#3b82f6'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { ...chartOpts, cutout: '65%' }
+            // Product breakdown chart
+            const productCounts = {};
+            s.vouchDetails.forEach(v => {
+                const p = v.product || 'Unknown';
+                productCounts[p] = (productCounts[p] || 0) + 1;
             });
 
-            typesChart = new Chart(document.getElementById('typesChart'), {
+            const productColors = {
+                'Controller Macro': '#8b5cf6',
+                'Zero Delay': '#3b82f6',
+                'Zero Delay Plus': '#06b6d4',
+                'FPS Boost': '#10b981',
+                'Ping Optimizer': '#f97316',
+                'Premium Utility': '#eab308',
+                'Aim Bundle': '#ec4899',
+                'Shotgun Pack': '#f43f5e',
+                'Keyboard Macro': '#6366f1',
+                'Unknown': '#6b7280'
+            };
+
+            if (productsChart) productsChart.destroy();
+
+            productsChart = new Chart(document.getElementById('productsChart'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Controller', 'Regular'],
+                    labels: Object.keys(productCounts),
                     datasets: [{
-                        data: [controller || 0, regular || 0],
-                        backgroundColor: ['#8b5cf6', '#10b981'],
+                        data: Object.values(productCounts),
+                        backgroundColor: Object.keys(productCounts).map(p => productColors[p] || '#6b7280'),
                         borderWidth: 0
                     }]
                 },
-                options: { ...chartOpts, cutout: '65%' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '55%',
+                    plugins: {
+                        legend: { 
+                            position: 'right',
+                            labels: { color: '#a0a0a0', font: { family: 'Outfit', size: 12 }, padding: 12 }
+                        }
+                    }
+                }
             });
 
             // Vouches
