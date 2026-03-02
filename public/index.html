@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Portal | SJTweaks</title>
+    <title>Vouch Tracker | SJTweaks</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -22,6 +22,7 @@
             --orange: #f97316;
             --blue: #3b82f6;
             --purple: #8b5cf6;
+            --cyan: #06b6d4;
         }
 
         body {
@@ -32,7 +33,6 @@
             line-height: 1.5;
         }
 
-        /* Subtle noise texture */
         body::before {
             content: '';
             position: fixed;
@@ -46,17 +46,16 @@
         .app {
             position: relative;
             z-index: 1;
-            max-width: 1100px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 24px;
         }
 
-        /* Header */
         header {
             display: flex;
             align-items: center;
             gap: 16px;
-            margin-bottom: 48px;
+            margin-bottom: 40px;
             padding-bottom: 24px;
             border-bottom: 1px solid var(--border);
         }
@@ -78,130 +77,25 @@
             font-weight: 400;
         }
 
-        /* Staff tabs */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-        }
-
-        .tab {
-            padding: 12px 24px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-2);
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .tab:hover {
-            background: var(--surface-2);
-            color: var(--text);
-        }
-
-        .tab.active {
-            background: var(--text);
-            color: var(--bg);
-            border-color: var(--text);
-        }
-
-        /* Dashboard layout */
-        .dashboard {
-            display: none;
-            gap: 24px;
-        }
-
-        .dashboard.active {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            animation: fadeUp 0.4s ease;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Cards */
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-        }
-
-        .card-title {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-2);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 16px;
-        }
-
-        /* Stats row */
-        .stats-row {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-        }
-
-        .stat {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-2);
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2rem;
-            font-weight: 600;
-        }
-
-        .stat-value.green { color: var(--accent); }
-        .stat-value.purple { color: var(--purple); }
-
-        /* Chart card */
-        .chart-card {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chart-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-        }
-
-        .chart-container canvas {
-            max-width: 180px !important;
-            max-height: 180px !important;
-        }
-
-        /* Upload card */
+        /* Upload section */
         .upload-card {
-            grid-column: 1 / -1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .upload-card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
 
         .upload-zone {
             border: 2px dashed var(--border);
             border-radius: 12px;
-            padding: 48px;
+            padding: 60px 40px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
@@ -215,14 +109,14 @@
         .upload-zone input { display: none; }
 
         .upload-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
+            font-size: 3rem;
+            margin-bottom: 16px;
         }
 
         .upload-zone h3 {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 500;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .upload-zone p {
@@ -234,126 +128,195 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
+            padding: 20px;
         }
 
         .preview.show { display: flex; }
 
         .preview img {
-            max-width: 280px;
-            max-height: 180px;
-            border-radius: 8px;
+            max-width: 350px;
+            max-height: 220px;
+            border-radius: 12px;
             border: 1px solid var(--border);
         }
 
         .btn {
-            padding: 12px 32px;
+            padding: 14px 40px;
             background: var(--accent);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             color: #fff;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .btn:hover { background: var(--accent-2); }
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn:hover { background: var(--accent-2); transform: scale(1.02); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        .status {
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            display: none;
-        }
-
-        .status.show { display: block; }
-        .status.ok { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
-        .status.err { background: rgba(244, 63, 94, 0.15); color: var(--red); }
-
-        /* Vouches list */
-        .vouches-card {
-            grid-column: 1 / -1;
-        }
-
-        .vouch-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .vouch-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
+        .btn.analyzing {
             background: var(--surface-2);
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-
-        .vouch-item:hover { background: #252525; }
-
-        .vouch-info h4 {
-            font-size: 0.95rem;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .vouch-info p {
-            font-size: 0.8rem;
             color: var(--text-2);
         }
 
-        .vouch-amount {
+        /* Result card */
+        .result {
+            display: none;
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            margin-bottom: 32px;
+            animation: pop 0.4s ease;
+        }
+
+        .result.show { display: block; }
+
+        @keyframes pop {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .result.success { border: 2px solid var(--accent); }
+        .result.error { border: 2px solid var(--red); }
+
+        .result-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+        }
+
+        .result h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .result .amount {
             font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 16px 0;
+        }
+
+        .result .staff-credited {
             font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .result .product-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            background: var(--surface-2);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--text-2);
+            margin-top: 12px;
+        }
+
+        .result .error-msg {
+            color: var(--red);
+            font-size: 1rem;
+        }
+
+        .result .btn {
+            margin-top: 24px;
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        .result .btn:hover { background: var(--border); }
+
+        /* Stats grid */
+        .stats-section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-2);
+        }
+
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .staff-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .staff-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--staff-color);
+        }
+
+        .staff-stat .name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--staff-color);
+        }
+
+        .staff-stat .earnings {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
             font-weight: 600;
             color: var(--accent);
         }
 
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            border-radius: 4px;
-            margin-left: 8px;
-        }
-
-        .tag.controller { background: var(--purple); color: #fff; }
-        .tag.regular { background: var(--border); color: var(--text-2); }
-
-        .empty {
-            text-align: center;
-            padding: 48px;
+        .staff-stat .count {
+            font-size: 0.8rem;
             color: var(--text-2);
+            margin-top: 4px;
         }
 
-        .empty span { font-size: 2rem; display: block; margin-bottom: 12px; }
-
-        /* Prompt */
-        #prompt {
-            text-align: center;
-            padding: 80px 24px;
-            color: var(--text-2);
+        /* Chart */
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
         }
 
-        #prompt h2 {
-            font-size: 1.3rem;
+        .chart-card h3 {
+            font-size: 0.85rem;
             font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text);
+            color: var(--text-2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
         }
 
-        @media (max-width: 700px) {
-            .dashboard.active { grid-template-columns: 1fr; }
-            .stats-row { grid-template-columns: 1fr; }
-            .stat-value { font-size: 1.5rem; }
+        .chart-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .chart-wrap canvas {
+            max-width: 280px !important;
+            max-height: 280px !important;
+        }
+
+        .hint {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-2);
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -361,167 +324,144 @@
     <div class="app">
         <header>
             <img src="https://i.imgur.com/MBCguvv.png" alt="SJTweaks" class="logo">
-            <h1>Staff Portal <span>/ vouches</span></h1>
+            <h1>Vouch Tracker <span>/ staff earnings</span></h1>
         </header>
 
-        <div class="tabs">
-            <button class="tab" data-staff="sjay">SJay</button>
-            <button class="tab" data-staff="nouzen">Nouzen</button>
-            <button class="tab" data-staff="daedae">DaeDae</button>
-            <button class="tab" data-staff="kyzo">Kyzo</button>
-        </div>
-
-        <div id="prompt">
-            <h2>Select your name above</h2>
-            <p>to view your dashboard and submit vouches</p>
-        </div>
-
-        <div class="dashboard" id="dashboard">
-            <div class="stats-row">
-                <div class="stat">
-                    <div class="stat-label">Total Earned</div>
-                    <div class="stat-value green" id="totalEarned">$0.00</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">Total Vouches</div>
-                    <div class="stat-value" id="totalVouches">0</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">Controller Sales</div>
-                    <div class="stat-value purple" id="controllerCount">0</div>
-                </div>
+        <div class="upload-card">
+            <h2>Submit a Vouch</h2>
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept="image/*">
+                <div class="upload-icon">📸</div>
+                <h3>Drop vouch screenshot here</h3>
+                <p>AI will detect the staff member and product automatically</p>
             </div>
+            <div class="preview" id="preview">
+                <img id="previewImg" src="" alt="">
+                <button class="btn" id="submitBtn">Analyze & Submit</button>
+            </div>
+        </div>
 
-            <div class="card chart-card" style="grid-column: 1 / -1;">
-                <div class="card-title">Products Sold</div>
-                <div class="chart-container" style="min-height: 280px;">
+        <div class="result" id="result">
+            <div class="result-icon" id="resultIcon">✅</div>
+            <h3 id="resultTitle">Vouch Approved!</h3>
+            <div class="amount" id="resultAmount">+$0.00</div>
+            <div class="staff-credited" id="resultStaff">Added to SJay's earnings</div>
+            <div class="product-tag" id="resultProduct">Zero Delay</div>
+            <button class="btn" onclick="resetForm()">Submit Another</button>
+        </div>
+
+        <section class="stats-section">
+            <h2>Staff Earnings</h2>
+            <div class="staff-grid" id="staffGrid">
+                <div class="hint">Loading stats...</div>
+            </div>
+            
+            <div class="chart-card" id="chartCard" style="display: none;">
+                <h3>Products Breakdown</h3>
+                <div class="chart-wrap">
                     <canvas id="productsChart"></canvas>
                 </div>
             </div>
-
-            <div class="card upload-card">
-                <div class="card-title">Submit Vouch</div>
-                <div class="upload-zone" id="uploadZone">
-                    <input type="file" id="fileInput" accept="image/*">
-                    <div class="upload-icon">📸</div>
-                    <h3>Drop screenshot here</h3>
-                    <p>or click to browse</p>
-                </div>
-                <div class="preview" id="preview">
-                    <img id="previewImg" src="" alt="">
-                    <button class="btn" id="submitBtn" disabled>Analyze & Submit</button>
-                </div>
-                <div class="status" id="status"></div>
-            </div>
-
-            <div class="card vouches-card">
-                <div class="card-title">Your Vouches</div>
-                <div class="vouch-list" id="vouchList"></div>
-            </div>
-        </div>
+        </section>
     </div>
 
     <script>
         const API = '';
-        let staff = null;
         let file = null;
-        let productsChart;
+        let chart = null;
 
-        // Tabs
-        document.querySelectorAll('.tab').forEach(t => {
-            t.onclick = () => {
-                document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-                t.classList.add('active');
-                staff = t.dataset.staff;
-                document.getElementById('prompt').style.display = 'none';
-                document.getElementById('dashboard').classList.add('active');
-                loadData();
-            };
-        });
+        const STAFF_COLORS = {
+            sjay: '#06b6d4',
+            nouzen: '#f43f5e',
+            daedae: '#10b981',
+            kyzo: '#8b5cf6'
+        };
 
-        async function loadData() {
-            const res = await fetch(`${API}/api/vouches/staff/${staff}`);
-            const data = await res.json();
-            if (!data.success) return;
-
-            const s = data.staff;
-            document.getElementById('totalEarned').textContent = `$${s.totalEarnings.toFixed(2)}`;
-            document.getElementById('totalVouches').textContent = s.vouchCount;
-            
-            const controller = s.vouchDetails.filter(v => v.isController).length;
-            const regular = s.vouchCount - controller;
-            document.getElementById('controllerCount').textContent = controller;
-
-            // Product breakdown chart
-            const productCounts = {};
-            s.vouchDetails.forEach(v => {
-                const p = v.product || 'Unknown';
-                productCounts[p] = (productCounts[p] || 0) + 1;
-            });
-
-            const productColors = {
-                'Controller Macro': '#8b5cf6',
-                'Zero Delay': '#3b82f6',
-                'Zero Delay Plus': '#06b6d4',
-                'FPS Boost': '#10b981',
-                'Ping Optimizer': '#f97316',
-                'Premium Utility': '#eab308',
-                'Aim Bundle': '#ec4899',
-                'Shotgun Pack': '#f43f5e',
-                'Keyboard Macro': '#6366f1',
-                'Unknown': '#6b7280'
-            };
-
-            if (productsChart) productsChart.destroy();
-
-            productsChart = new Chart(document.getElementById('productsChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(productCounts),
-                    datasets: [{
-                        data: Object.values(productCounts),
-                        backgroundColor: Object.keys(productCounts).map(p => productColors[p] || '#6b7280'),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '55%',
-                    plugins: {
-                        legend: { 
-                            position: 'right',
-                            labels: { color: '#a0a0a0', font: { family: 'Outfit', size: 12 }, padding: 12 }
-                        }
-                    }
+        // Load all staff stats
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API}/api/vouches/admin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: 'sofmun-Gitpox-syzto1' })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    renderStats(data);
                 }
-            });
-
-            // Vouches
-            const list = document.getElementById('vouchList');
-            if (!s.vouchDetails.length) {
-                list.innerHTML = '<div class="empty"><span>📋</span>No vouches yet. Submit your first one above!</div>';
-                return;
+            } catch (e) {
+                console.error(e);
             }
-
-            list.innerHTML = s.vouchDetails.map(v => `
-                <div class="vouch-item">
-                    <div class="vouch-info">
-                        <h4>${v.product}<span class="tag ${v.isController ? 'controller' : 'regular'}">${v.isController ? '$3' : '$1'}</span></h4>
-                        <p>${new Date(v.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${v.staffInvolved.length > 1 ? ` • split with ${v.staffInvolved.filter(x => x !== staff).join(', ')}` : ''}</p>
-                    </div>
-                    <div class="vouch-amount">+$${v.earningsPerPerson.toFixed(2)}</div>
-                </div>
-            `).join('');
         }
 
-        // Upload
+        function renderStats(data) {
+            const grid = document.getElementById('staffGrid');
+            grid.innerHTML = data.staff.map(s => `
+                <div class="staff-stat" style="--staff-color: ${STAFF_COLORS[s.id]}">
+                    <div class="name">${s.name}</div>
+                    <div class="earnings">$${s.totalEarnings.toFixed(2)}</div>
+                    <div class="count">${s.vouchCount} vouches</div>
+                </div>
+            `).join('');
+
+            // Chart
+            if (data.recentVouches.length > 0) {
+                document.getElementById('chartCard').style.display = 'block';
+                
+                const productCounts = {};
+                data.recentVouches.forEach(v => {
+                    const p = v.product || 'Unknown';
+                    productCounts[p] = (productCounts[p] || 0) + 1;
+                });
+
+                const productColors = {
+                    'Controller Macro': '#8b5cf6',
+                    'Zero Delay': '#3b82f6',
+                    'Zero Delay Plus': '#06b6d4',
+                    'FPS Boost': '#10b981',
+                    'Ping Optimizer': '#f97316',
+                    'Premium Utility': '#eab308',
+                    'Aim Bundle': '#ec4899',
+                    'Shotgun Pack': '#f43f5e',
+                    'Keyboard Macro': '#6366f1',
+                    'Unknown': '#6b7280'
+                };
+
+                if (chart) chart.destroy();
+                chart = new Chart(document.getElementById('productsChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(productCounts),
+                        datasets: [{
+                            data: Object.values(productCounts),
+                            backgroundColor: Object.keys(productCounts).map(p => productColors[p] || '#6b7280'),
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '55%',
+                        plugins: {
+                            legend: { 
+                                position: 'bottom',
+                                labels: { color: '#a0a0a0', font: { family: 'Outfit', size: 11 }, padding: 10 }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        loadStats();
+
+        // Upload handling
         const zone = document.getElementById('uploadZone');
         const input = document.getElementById('fileInput');
         const preview = document.getElementById('preview');
         const previewImg = document.getElementById('previewImg');
         const submitBtn = document.getElementById('submitBtn');
-        const status = document.getElementById('status');
+        const result = document.getElementById('result');
 
         zone.onclick = () => input.click();
         zone.ondragover = e => { e.preventDefault(); zone.classList.add('drag'); };
@@ -537,16 +477,16 @@
                 previewImg.src = e.target.result;
                 zone.style.display = 'none';
                 preview.classList.add('show');
-                submitBtn.disabled = false;
             };
             r.readAsDataURL(f);
         }
 
         submitBtn.onclick = async () => {
-            if (!file || !staff) return;
+            if (!file) return;
+            
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Analyzing...';
-            status.className = 'status';
+            submitBtn.textContent = 'Analyzing with AI...';
+            submitBtn.classList.add('analyzing');
 
             const base64 = await new Promise(r => {
                 const reader = new FileReader();
@@ -558,30 +498,50 @@
                 const res = await fetch(`${API}/api/vouches/submit`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ staffId: staff, imageBase64: base64 })
+                    body: JSON.stringify({ imageBase64: base64 })
                 });
                 const data = await res.json();
 
+                preview.classList.remove('show');
+                result.classList.add('show');
+
                 if (data.success) {
-                    status.textContent = `✓ ${data.message}`;
-                    status.className = 'status show ok';
-                    preview.classList.remove('show');
-                    zone.style.display = '';
-                    file = null;
-                    input.value = '';
-                    loadData();
+                    result.className = 'result show success';
+                    document.getElementById('resultIcon').textContent = '✅';
+                    document.getElementById('resultTitle').textContent = 'Vouch Approved!';
+                    document.getElementById('resultAmount').textContent = `+$${data.amountPerPerson.toFixed(2)}`;
+                    document.getElementById('resultStaff').textContent = `Added to ${data.staffCredited.join(' & ')}'s earnings`;
+                    document.getElementById('resultProduct').textContent = data.product || 'Unknown Product';
+                    document.getElementById('resultProduct').style.display = 'inline-block';
+                    loadStats();
                 } else {
-                    status.textContent = `✗ ${data.error}`;
-                    status.className = 'status show err';
+                    result.className = 'result show error';
+                    document.getElementById('resultIcon').textContent = '❌';
+                    document.getElementById('resultTitle').textContent = 'Vouch Rejected';
+                    document.getElementById('resultAmount').textContent = '';
+                    document.getElementById('resultStaff').innerHTML = `<span class="error-msg">${data.error}</span>`;
+                    document.getElementById('resultProduct').style.display = 'none';
                 }
             } catch (e) {
-                status.textContent = `✗ ${e.message}`;
-                status.className = 'status show err';
+                result.className = 'result show error';
+                document.getElementById('resultIcon').textContent = '❌';
+                document.getElementById('resultTitle').textContent = 'Error';
+                document.getElementById('resultAmount').textContent = '';
+                document.getElementById('resultStaff').innerHTML = `<span class="error-msg">${e.message}</span>`;
+                document.getElementById('resultProduct').style.display = 'none';
             }
 
+            submitBtn.disabled = false;
             submitBtn.textContent = 'Analyze & Submit';
-            submitBtn.disabled = true;
+            submitBtn.classList.remove('analyzing');
         };
+
+        function resetForm() {
+            result.classList.remove('show');
+            zone.style.display = '';
+            file = null;
+            input.value = '';
+        }
     </script>
 </body>
 </html>
