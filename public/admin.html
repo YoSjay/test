@@ -530,18 +530,39 @@
                 }
             });
 
-            const ctrlTotal = data.recentVouches.filter(v => v.isController).length;
-            const regTotal = data.recentVouches.length - ctrlTotal;
+            // Count by product
+            const productCounts = {};
+            data.recentVouches.forEach(v => {
+                const p = v.product || 'Unknown';
+                productCounts[p] = (productCounts[p] || 0) + 1;
+            });
+            
+            const productColors = {
+                'Controller Macro': '#8b5cf6',
+                'Zero Delay': '#3b82f6',
+                'Zero Delay Plus': '#06b6d4',
+                'FPS Boost': '#10b981',
+                'Ping Optimizer': '#f97316',
+                'Premium Utility': '#eab308',
+                'Aim Bundle': '#ec4899',
+                'Shotgun Pack': '#f43f5e',
+                'Keyboard Macro': '#6366f1',
+                'Unknown': '#6b7280'
+            };
 
             new Chart(document.getElementById('productChart'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Controller ($3)', 'Regular ($1)'],
-                    datasets: [{ data: [ctrlTotal, regTotal], backgroundColor: ['#8b5cf6', '#3b82f6'], borderWidth: 0 }]
+                    labels: Object.keys(productCounts),
+                    datasets: [{ 
+                        data: Object.values(productCounts), 
+                        backgroundColor: Object.keys(productCounts).map(p => productColors[p] || '#6b7280'),
+                        borderWidth: 0 
+                    }]
                 },
                 options: {
                     cutout: '60%',
-                    plugins: { legend: { position: 'bottom', labels: { color: '#a0a0a0', font: { family: 'Outfit' }, padding: 12 } } }
+                    plugins: { legend: { position: 'bottom', labels: { color: '#a0a0a0', font: { family: 'Outfit', size: 11 }, padding: 8 } } }
                 }
             });
 
