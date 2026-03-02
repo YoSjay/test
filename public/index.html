@@ -3,722 +3,591 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SJTweaks Staff Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Staff Portal | SJTweaks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
-            --bg-dark: #0a0a0f;
-            --bg-card: #12121a;
-            --bg-card-hover: #1a1a25;
-            --cyan: #00d9ff;
-            --cyan-dim: #00d9ff40;
-            --text: #e8e8e8;
-            --text-dim: #888;
-            --success: #22c55e;
-            --error: #ef4444;
-            --warning: #f59e0b;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --bg: #0d0d0d;
+            --surface: #161616;
+            --surface-2: #1f1f1f;
+            --border: #2a2a2a;
+            --text: #fafafa;
+            --text-2: #a0a0a0;
+            --accent: #10b981;
+            --accent-2: #059669;
+            --red: #f43f5e;
+            --orange: #f97316;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
         }
 
         body {
-            font-family: 'Syne', sans-serif;
-            background: var(--bg-dark);
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            overflow-x: hidden;
+            line-height: 1.5;
         }
 
-        /* Animated background */
-        .bg-grid {
+        /* Subtle noise texture */
+        body::before {
+            content: '';
             position: fixed;
             inset: 0;
-            background-image: 
-                linear-gradient(rgba(0, 217, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 217, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
             pointer-events: none;
             z-index: 0;
         }
 
-        .bg-glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--cyan-dim) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(100px);
-            pointer-events: none;
-            z-index: 0;
-            animation: float 20s ease-in-out infinite;
-        }
-
-        .bg-glow:nth-child(1) { top: -200px; left: -200px; }
-        .bg-glow:nth-child(2) { bottom: -200px; right: -200px; animation-delay: -10s; }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(50px, 50px); }
-        }
-
-        /* Main container */
-        .container {
+        .app {
             position: relative;
             z-index: 1;
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 40px 24px;
         }
 
         /* Header */
-        .header {
+        header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 50px;
+            gap: 16px;
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
         }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            width: 44px;
+            height: 44px;
+            filter: brightness(1.2);
         }
 
-        .logo img {
-            width: 50px;
-            height: 50px;
-            filter: drop-shadow(0 0 20px var(--cyan));
+        header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
         }
 
-        .logo h1 {
-            font-family: 'Space Mono', monospace;
-            font-size: 1.5rem;
-            color: var(--cyan);
-            text-shadow: 0 0 30px var(--cyan);
-        }
-
-        .logo span {
-            font-size: 0.9rem;
-            color: var(--text-dim);
+        header h1 span {
+            color: var(--text-2);
             font-weight: 400;
         }
 
-        /* Staff selector */
-        .staff-selector {
+        /* Staff tabs */
+        .tabs {
             display: flex;
-            gap: 15px;
+            gap: 8px;
+            margin-bottom: 32px;
             flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 40px;
         }
 
-        .staff-btn {
-            padding: 15px 30px;
-            background: var(--bg-card);
-            border: 2px solid transparent;
-            border-radius: 12px;
-            color: var(--text);
-            font-family: 'Syne', sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
+        .tab {
+            padding: 12px 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-2);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s;
         }
 
-        .staff-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%);
-            transform: translateX(-100%);
-            transition: transform 0.5s;
+        .tab:hover {
+            background: var(--surface-2);
+            color: var(--text);
         }
 
-        .staff-btn:hover::before {
-            transform: translateX(100%);
+        .tab.active {
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
         }
 
-        .staff-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .staff-btn.active {
-            border-color: var(--staff-color, var(--cyan));
-            box-shadow: 0 0 30px var(--staff-color, var(--cyan-dim));
-        }
-
-        /* Dashboard */
+        /* Dashboard layout */
         .dashboard {
             display: none;
+            gap: 24px;
         }
 
         .dashboard.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            animation: fadeUp 0.4s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Stats cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
         }
 
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--staff-color, var(--cyan));
-        }
-
-        .stat-card h3 {
-            color: var(--text-dim);
-            font-size: 0.9rem;
-            font-weight: 400;
-            margin-bottom: 10px;
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-2);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
         }
 
-        .stat-card .value {
-            font-family: 'Space Mono', monospace;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text);
+        /* Stats row */
+        .stats-row {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
 
-        .stat-card .value.money {
-            color: var(--success);
+        .stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
         }
 
-        /* Upload section */
-        .upload-section {
-            background: var(--bg-card);
-            border: 2px dashed rgba(255,255,255,0.2);
-            border-radius: 16px;
-            padding: 50px;
-            text-align: center;
-            margin-bottom: 40px;
-            transition: all 0.3s ease;
-            cursor: pointer;
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-2);
+            margin-bottom: 8px;
         }
 
-        .upload-section:hover, .upload-section.dragover {
-            border-color: var(--cyan);
-            background: rgba(0, 217, 255, 0.05);
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 600;
         }
 
-        .upload-section input {
-            display: none;
+        .stat-value.green { color: var(--accent); }
+        .stat-value.purple { color: var(--purple); }
+
+        /* Chart card */
+        .chart-card {
+            display: flex;
+            flex-direction: column;
         }
 
-        .upload-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, var(--cyan) 0%, #0099cc 100%);
-            border-radius: 50%;
+        .chart-container {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            min-height: 200px;
         }
 
-        .upload-section h3 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
+        .chart-container canvas {
+            max-width: 180px !important;
+            max-height: 180px !important;
         }
 
-        .upload-section p {
-            color: var(--text-dim);
+        /* Upload card */
+        .upload-card {
+            grid-column: 1 / -1;
         }
 
-        /* Preview */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 48px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-zone:hover, .upload-zone.drag {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .upload-zone input { display: none; }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .upload-zone p {
+            color: var(--text-2);
+            font-size: 0.9rem;
+        }
+
         .preview {
             display: none;
-            margin-top: 20px;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
         }
 
-        .preview.show {
-            display: block;
-        }
+        .preview.show { display: flex; }
 
         .preview img {
-            max-width: 300px;
-            max-height: 200px;
-            border-radius: 12px;
-            border: 2px solid var(--cyan);
+            max-width: 280px;
+            max-height: 180px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
-        .submit-btn {
-            margin-top: 20px;
-            padding: 15px 50px;
-            background: linear-gradient(135deg, var(--cyan) 0%, #0099cc 100%);
+        .btn {
+            padding: 12px 32px;
+            background: var(--accent);
             border: none;
-            border-radius: 12px;
-            color: #000;
-            font-family: 'Syne', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
         }
 
-        .submit-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 40px rgba(0, 217, 255, 0.4);
-        }
+        .btn:hover { background: var(--accent-2); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Status message */
         .status {
-            margin-top: 20px;
-            padding: 15px 25px;
-            border-radius: 12px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
             display: none;
         }
 
-        .status.show {
-            display: block;
-            animation: slideIn 0.3s ease;
+        .status.show { display: block; }
+        .status.ok { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
+        .status.err { background: rgba(244, 63, 94, 0.15); color: var(--red); }
+
+        /* Vouches list */
+        .vouches-card {
+            grid-column: 1 / -1;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .status.success {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
-
-        .status.error {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid var(--error);
-            color: var(--error);
-        }
-
-        /* Vouch history */
-        .vouches-section h2 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .vouches-section h2::before {
-            content: '';
-            width: 4px;
-            height: 25px;
-            background: var(--staff-color, var(--cyan));
-            border-radius: 2px;
-        }
-
-        .vouches-list {
+        .vouch-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .vouch-item {
-            background: var(--bg-card);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
+            padding: 16px;
+            background: var(--surface-2);
+            border-radius: 8px;
+            transition: background 0.2s;
         }
 
-        .vouch-item:hover {
-            background: var(--bg-card-hover);
-            transform: translateX(5px);
+        .vouch-item:hover { background: #252525; }
+
+        .vouch-info h4 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 4px;
         }
 
-        .vouch-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .vouch-product {
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .vouch-product .tag {
-            font-size: 0.7rem;
-            padding: 3px 8px;
-            background: var(--cyan-dim);
-            color: var(--cyan);
-            border-radius: 4px;
-            font-weight: 700;
-        }
-
-        .vouch-product .tag.controller {
-            background: rgba(168, 85, 247, 0.3);
-            color: #a855f7;
-        }
-
-        .vouch-meta {
-            font-size: 0.85rem;
-            color: var(--text-dim);
+        .vouch-info p {
+            font-size: 0.8rem;
+            color: var(--text-2);
         }
 
         .vouch-amount {
-            font-family: 'Space Mono', monospace;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--success);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
         }
 
-        .vouch-split {
-            font-size: 0.8rem;
-            color: var(--warning);
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 4px;
+            margin-left: 8px;
         }
 
-        /* Empty state */
-        .empty-state {
+        .tag.controller { background: var(--purple); color: #fff; }
+        .tag.regular { background: var(--border); color: var(--text-2); }
+
+        .empty {
             text-align: center;
-            padding: 60px 20px;
-            color: var(--text-dim);
+            padding: 48px;
+            color: var(--text-2);
         }
 
-        .empty-state svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.3;
+        .empty span { font-size: 2rem; display: block; margin-bottom: 12px; }
+
+        /* Prompt */
+        #prompt {
+            text-align: center;
+            padding: 80px 24px;
+            color: var(--text-2);
         }
 
-        /* Loading */
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 20px;
+        #prompt h2 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
         }
 
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid var(--bg-card);
-            border-top-color: var(--cyan);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-
-            .stat-card .value {
-                font-size: 2rem;
-            }
-
-            .vouch-item {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
+        @media (max-width: 700px) {
+            .dashboard.active { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr; }
+            .stat-value { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-glow"></div>
-    <div class="bg-glow"></div>
-    <div class="bg-grid"></div>
-
-    <div class="container">
-        <header class="header">
-            <div class="logo">
-                <img src="https://i.imgur.com/MBCguvv.png" alt="SJTweaks">
-                <div>
-                    <h1>STAFF PORTAL</h1>
-                    <span>Track your vouches & earnings</span>
-                </div>
-            </div>
+    <div class="app">
+        <header>
+            <img src="https://i.imgur.com/MBCguvv.png" alt="SJTweaks" class="logo">
+            <h1>Staff Portal <span>/ vouches</span></h1>
         </header>
 
-        <div class="staff-selector">
-            <button class="staff-btn" data-staff="sjay" style="--staff-color: #00d9ff">SJay</button>
-            <button class="staff-btn" data-staff="nouzen" style="--staff-color: #ff6b6b">Nouzen</button>
-            <button class="staff-btn" data-staff="daedae" style="--staff-color: #4ecdc4">DaeDae</button>
-            <button class="staff-btn" data-staff="kyzo" style="--staff-color: #a855f7">Kyzo</button>
+        <div class="tabs">
+            <button class="tab" data-staff="sjay">SJay</button>
+            <button class="tab" data-staff="nouzen">Nouzen</button>
+            <button class="tab" data-staff="daedae">DaeDae</button>
+            <button class="tab" data-staff="kyzo">Kyzo</button>
+        </div>
+
+        <div id="prompt">
+            <h2>Select your name above</h2>
+            <p>to view your dashboard and submit vouches</p>
         </div>
 
         <div class="dashboard" id="dashboard">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Total Earnings</h3>
-                    <div class="value money" id="totalEarnings">$0.00</div>
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-label">Total Earned</div>
+                    <div class="stat-value green" id="totalEarned">$0.00</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Total Vouches</h3>
-                    <div class="value" id="totalVouches">0</div>
+                <div class="stat">
+                    <div class="stat-label">Total Vouches</div>
+                    <div class="stat-value" id="totalVouches">0</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Controller Sales</h3>
-                    <div class="value" id="controllerSales">0</div>
+                <div class="stat">
+                    <div class="stat-label">Controller Sales</div>
+                    <div class="stat-value purple" id="controllerCount">0</div>
                 </div>
             </div>
 
-            <div class="upload-section" id="uploadZone">
-                <input type="file" id="fileInput" accept="image/*">
-                <div class="upload-icon">📸</div>
-                <h3>Submit a Vouch</h3>
-                <p>Drag & drop a screenshot or click to upload</p>
+            <div class="card chart-card">
+                <div class="card-title">Earnings Breakdown</div>
+                <div class="chart-container">
+                    <canvas id="earningsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <div class="card-title">Vouch Types</div>
+                <div class="chart-container">
+                    <canvas id="typesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card upload-card">
+                <div class="card-title">Submit Vouch</div>
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="fileInput" accept="image/*">
+                    <div class="upload-icon">📸</div>
+                    <h3>Drop screenshot here</h3>
+                    <p>or click to browse</p>
+                </div>
                 <div class="preview" id="preview">
-                    <img id="previewImg" src="" alt="Preview">
-                    <br>
-                    <button class="submit-btn" id="submitBtn" disabled>Analyze & Submit</button>
+                    <img id="previewImg" src="" alt="">
+                    <button class="btn" id="submitBtn" disabled>Analyze & Submit</button>
                 </div>
                 <div class="status" id="status"></div>
             </div>
 
-            <section class="vouches-section">
-                <h2>Your Vouches</h2>
-                <div class="vouches-list" id="vouchesList">
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <span>Loading...</span>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <div id="selectPrompt" style="text-align: center; padding: 100px 20px; color: var(--text-dim);">
-            <h2 style="margin-bottom: 10px;">👆 Select your name above</h2>
-            <p>to view your dashboard and submit vouches</p>
+            <div class="card vouches-card">
+                <div class="card-title">Your Vouches</div>
+                <div class="vouch-list" id="vouchList"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = '';
-        let currentStaff = null;
-        let selectedFile = null;
+        const API = '';
+        let staff = null;
+        let file = null;
+        let earningsChart, typesChart;
 
-        // Staff buttons
-        document.querySelectorAll('.staff-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.staff-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentStaff = btn.dataset.staff;
-                
-                document.documentElement.style.setProperty('--staff-color', getComputedStyle(btn).getPropertyValue('--staff-color'));
-                
-                document.getElementById('selectPrompt').style.display = 'none';
+        // Tabs
+        document.querySelectorAll('.tab').forEach(t => {
+            t.onclick = () => {
+                document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+                t.classList.add('active');
+                staff = t.dataset.staff;
+                document.getElementById('prompt').style.display = 'none';
                 document.getElementById('dashboard').classList.add('active');
-                
-                loadStaffData();
-            });
+                loadData();
+            };
         });
 
-        // Load staff data
-        async function loadStaffData() {
-            try {
-                const res = await fetch(`${API_BASE}/api/vouches/staff/${currentStaff}`);
-                const data = await res.json();
+        async function loadData() {
+            const res = await fetch(`${API}/api/vouches/staff/${staff}`);
+            const data = await res.json();
+            if (!data.success) return;
 
-                if (data.success) {
-                    document.getElementById('totalEarnings').textContent = `$${data.staff.totalEarnings.toFixed(2)}`;
-                    document.getElementById('totalVouches').textContent = data.staff.vouchCount;
-                    
-                    const controllerCount = data.staff.vouchDetails.filter(v => v.isController).length;
-                    document.getElementById('controllerSales').textContent = controllerCount;
-
-                    renderVouches(data.staff.vouchDetails);
-                }
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
-        }
-
-        function renderVouches(vouches) {
-            const list = document.getElementById('vouchesList');
+            const s = data.staff;
+            document.getElementById('totalEarned').textContent = `$${s.totalEarnings.toFixed(2)}`;
+            document.getElementById('totalVouches').textContent = s.vouchCount;
             
-            if (!vouches || vouches.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <h3>No vouches yet</h3>
-                        <p>Submit your first vouch screenshot above!</p>
-                    </div>
-                `;
+            const controller = s.vouchDetails.filter(v => v.isController).length;
+            const regular = s.vouchCount - controller;
+            document.getElementById('controllerCount').textContent = controller;
+
+            // Charts
+            const controllerEarn = controller * 3;
+            const regularEarn = s.totalEarnings - controllerEarn;
+
+            if (earningsChart) earningsChart.destroy();
+            if (typesChart) typesChart.destroy();
+
+            const chartOpts = {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: { color: '#a0a0a0', font: { family: 'Outfit', size: 12 }, padding: 16 }
+                    }
+                }
+            };
+
+            earningsChart = new Chart(document.getElementById('earningsChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Controller ($3)', 'Regular ($1)'],
+                    datasets: [{
+                        data: [controllerEarn || 0, regularEarn || 0],
+                        backgroundColor: ['#8b5cf6', '#3b82f6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { ...chartOpts, cutout: '65%' }
+            });
+
+            typesChart = new Chart(document.getElementById('typesChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Controller', 'Regular'],
+                    datasets: [{
+                        data: [controller || 0, regular || 0],
+                        backgroundColor: ['#8b5cf6', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { ...chartOpts, cutout: '65%' }
+            });
+
+            // Vouches
+            const list = document.getElementById('vouchList');
+            if (!s.vouchDetails.length) {
+                list.innerHTML = '<div class="empty"><span>📋</span>No vouches yet. Submit your first one above!</div>';
                 return;
             }
 
-            list.innerHTML = vouches.map(v => `
+            list.innerHTML = s.vouchDetails.map(v => `
                 <div class="vouch-item">
                     <div class="vouch-info">
-                        <div class="vouch-product">
-                            ${v.product}
-                            <span class="tag ${v.isController ? 'controller' : ''}">${v.isController ? '$3' : '$1'}</span>
-                        </div>
-                        <div class="vouch-meta">
-                            ${new Date(v.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                            ${v.staffInvolved.length > 1 ? ` • Split with ${v.staffInvolved.filter(s => s !== currentStaff).join(', ')}` : ''}
-                        </div>
+                        <h4>${v.product}<span class="tag ${v.isController ? 'controller' : 'regular'}">${v.isController ? '$3' : '$1'}</span></h4>
+                        <p>${new Date(v.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}${v.staffInvolved.length > 1 ? ` • split with ${v.staffInvolved.filter(x => x !== staff).join(', ')}` : ''}</p>
                     </div>
-                    <div style="text-align: right;">
-                        <div class="vouch-amount">+$${v.earningsPerPerson.toFixed(2)}</div>
-                        ${v.staffInvolved.length > 1 ? `<div class="vouch-split">Split ${v.staffInvolved.length} ways</div>` : ''}
-                    </div>
+                    <div class="vouch-amount">+$${v.earningsPerPerson.toFixed(2)}</div>
                 </div>
             `).join('');
         }
 
-        // File upload
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
+        // Upload
+        const zone = document.getElementById('uploadZone');
+        const input = document.getElementById('fileInput');
         const preview = document.getElementById('preview');
         const previewImg = document.getElementById('previewImg');
         const submitBtn = document.getElementById('submitBtn');
         const status = document.getElementById('status');
 
-        uploadZone.addEventListener('click', () => fileInput.click());
-        
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-        });
+        zone.onclick = () => input.click();
+        zone.ondragover = e => { e.preventDefault(); zone.classList.add('drag'); };
+        zone.ondragleave = () => zone.classList.remove('drag');
+        zone.ondrop = e => { e.preventDefault(); zone.classList.remove('drag'); handleFile(e.dataTransfer.files[0]); };
+        input.onchange = e => handleFile(e.target.files[0]);
 
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('dragover');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
-            if (e.dataTransfer.files[0]) {
-                handleFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files[0]) {
-                handleFile(e.target.files[0]);
-            }
-        });
-
-        function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showStatus('Please upload an image file', 'error');
-                return;
-            }
-
-            selectedFile = file;
-            const reader = new FileReader();
-            reader.onload = (e) => {
+        function handleFile(f) {
+            if (!f?.type.startsWith('image/')) return;
+            file = f;
+            const r = new FileReader();
+            r.onload = e => {
                 previewImg.src = e.target.result;
+                zone.style.display = 'none';
                 preview.classList.add('show');
                 submitBtn.disabled = false;
             };
-            reader.readAsDataURL(file);
+            r.readAsDataURL(f);
         }
 
-        submitBtn.addEventListener('click', async () => {
-            if (!selectedFile || !currentStaff) return;
-
+        submitBtn.onclick = async () => {
+            if (!file || !staff) return;
             submitBtn.disabled = true;
             submitBtn.textContent = 'Analyzing...';
             status.className = 'status';
-            status.style.display = 'none';
+
+            const base64 = await new Promise(r => {
+                const reader = new FileReader();
+                reader.onload = () => r(reader.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
 
             try {
-                const base64 = await fileToBase64(selectedFile);
-                
-                const res = await fetch(`${API_BASE}/api/vouches/submit`, {
+                const res = await fetch(`${API}/api/vouches/submit`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        staffId: currentStaff,
-                        imageBase64: base64
-                    })
+                    body: JSON.stringify({ staffId: staff, imageBase64: base64 })
                 });
-
                 const data = await res.json();
 
                 if (data.success) {
-                    showStatus(`✅ ${data.message}`, 'success');
+                    status.textContent = `✓ ${data.message}`;
+                    status.className = 'status show ok';
                     preview.classList.remove('show');
-                    selectedFile = null;
-                    fileInput.value = '';
-                    loadStaffData();
+                    zone.style.display = '';
+                    file = null;
+                    input.value = '';
+                    loadData();
                 } else {
-                    showStatus(`❌ ${data.error}`, 'error');
+                    status.textContent = `✗ ${data.error}`;
+                    status.className = 'status show err';
                 }
-            } catch (error) {
-                showStatus(`❌ Error: ${error.message}`, 'error');
+            } catch (e) {
+                status.textContent = `✗ ${e.message}`;
+                status.className = 'status show err';
             }
 
             submitBtn.textContent = 'Analyze & Submit';
             submitBtn.disabled = true;
-        });
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function showStatus(message, type) {
-            status.textContent = message;
-            status.className = `status show ${type}`;
-        }
+        };
     </script>
 </body>
 </html>
