@@ -107,7 +107,13 @@ PRODUCTS - Identify which product the vouch is for:
 
 Return the EXACT product name from the list above (e.g. "Zero Delay", "Premium Utility", "Controller Macro")
 
-STAFF NAMES TO LOOK FOR: sjay, nouzen, daedae, kyzo (case insensitive)
+STAFF NAMES TO LOOK FOR (check who helped the customer):
+- "sjay" or "sj" = SJAY
+- "nouzen" = NOUZEN  
+- "daedae" or "dae dae" or "dae" = DAEDAE
+- "kyzo" = KYZO
+
+Look for staff names mentioned in the vouch (customer thanking them, mentioning who helped, etc.)
 
 A valid vouch typically contains:
 - Customer saying thank you, appreciation, or positive feedback
@@ -163,22 +169,16 @@ app.get('/api/health', (req, res) => {
 // Submit a vouch
 app.post('/api/vouches/submit', async (req, res) => {
   try {
-    const { staffId, imageBase64 } = req.body;
-    
-    if (!staffId || !STAFF_MEMBERS[staffId.toLowerCase()]) {
-      return res.status(400).json({ success: false, error: 'Invalid staff member' });
-    }
+    const { imageBase64 } = req.body;
     
     if (!imageBase64) {
       return res.status(400).json({ success: false, error: 'No image provided' });
     }
-
-    const normalizedStaffId = staffId.toLowerCase();
     
-    console.log(`📸 Vouch submitted by ${normalizedStaffId}, analyzing...`);
+    console.log(`📸 Vouch submitted, analyzing with AI...`);
     
-    // Analyze with AI
-    const analysis = await analyzeVouchWithAI(imageBase64, STAFF_MEMBERS[normalizedStaffId].name);
+    // Analyze with AI - it detects staff from the image
+    const analysis = await analyzeVouchWithAI(imageBase64, 'unknown');
     
     console.log(`🤖 AI Analysis:`, analysis);
     
@@ -186,26 +186,26 @@ app.post('/api/vouches/submit', async (req, res) => {
       return res.json({ success: false, error: analysis.reason, analysis });
     }
 
-    // Calculate earnings
-    const baseAmount = analysis.isController ? 3 : 1;
+    // Get staff from AI detection
     let staffInvolved = analysis.staffMentioned?.length > 0 
       ? analysis.staffMentioned.filter(s => STAFF_MEMBERS[s.toLowerCase()])
-      : [normalizedStaffId];
+      : [];
+    
+    if (staffInvolved.length === 0) {
+      return res.json({ success: false, error: 'Could not detect staff name in the vouch. Make sure the customer mentions who helped them.', analysis });
+    }
     
     // Normalize staff IDs
     staffInvolved = staffInvolved.map(s => s.toLowerCase());
-    
-    // If the submitter isn't in the mentioned list, add them
-    if (!staffInvolved.includes(normalizedStaffId)) {
-      staffInvolved.push(normalizedStaffId);
-    }
-    
+
+    // Calculate earnings
+    const baseAmount = analysis.isController ? 3 : 1;
     const earningsPerPerson = baseAmount / staffInvolved.length;
 
     // Create vouch record
     const vouch = {
       id: crypto.randomBytes(8).toString('hex'),
-      submittedBy: normalizedStaffId,
+      submittedBy: staffInvolved[0], // First detected staff
       staffInvolved: staffInvolved,
       product: analysis.productMentioned || 'Unknown',
       isController: analysis.isController || false,
@@ -237,13 +237,27 @@ app.post('/api/vouches/submit', async (req, res) => {
 
     saveVouchDatabase();
     
-    console.log(`✅ Vouch approved: $${earningsPerPerson.toFixed(2)} to ${staffInvolved.join(', ')}`);
+    // Build nice message
+    const staffNames = staffInvolved.map(s => STAFF_MEMBERS[s]?.name || s);
+    const totalAmount = baseAmount;
+    let message;
+    
+    if (staffInvolved.length === 1) {
+      message = `$${totalAmount.toFixed(2)} has been added to ${staffNames[0]}'s earnings!`;
+    } else {
+      message = `$${earningsPerPerson.toFixed(2)} each has been added to ${staffNames.join(' & ')}! (split from $${totalAmount.toFixed(2)})`;
+    }
+    
+    console.log(`✅ ${message}`);
 
     res.json({ 
       success: true, 
       vouch,
       analysis,
-      message: `Vouch approved! $${earningsPerPerson.toFixed(2)} added to ${staffInvolved.join(', ')}`
+      message,
+      staffCredited: staffNames,
+      amountPerPerson: earningsPerPerson,
+      product: analysis.productMentioned
     });
   } catch (error) {
     console.error('Submit error:', error);
